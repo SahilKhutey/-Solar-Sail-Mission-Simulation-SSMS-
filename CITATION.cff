@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Mission Team"
+  given-names: "Solar Sail"
+title: "Solar Sail Mission Simulation (SSMS)"
+version: 1.0.0
+date-released: 2026-02-18
+url: "https://github.com/yourusername/solar-sail-sim"
+abstract: "A high-fidelity, Python-based solar sail simulation environment featuring N-body gravity, advanced SRP modeling, and trajectory optimization tools for interplanetary mission design."
+keywords:
+  - astrodynamics
+  - solar sail
+  - trajectory optimization
+  - space mission design
+  - python
+license: MIT

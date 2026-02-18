@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyd
+.venv/
+env/
+dist/
+build/
+*.egg-info/
+.idea/
+.vscode/
+.DS_Store
+*.log
+docs/_build/
+legacy/
+monte_carlo_results.png

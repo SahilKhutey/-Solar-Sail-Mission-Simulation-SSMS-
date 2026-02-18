@@ -1,0 +1,32 @@
+mission:
+  name: "Solar Sail Validation Mission"
+  start_date: "2026-01-01"
+  duration_days: 10.0
+  step_size: 60.0 # seconds
+
+spacecraft:
+  mass: 100.0 # kg
+  sail_area: 100.0 # m^2
+  reflectivity: 0.9
+  cd: 2.2 # Drag coefficient
+  inertia: [[100, 0, 0], [0, 100, 0], [0, 0, 100]]
+  r_cp: [0.1, 0.1, 0.0] # Center of pressure offset
+
+orbit:
+  type: "LEO"
+  altitude_km: 700.0
+  inclination_deg: 28.5
+  eccentricity: 0.001
+
+physics:
+  gravity_model: "two_body" # options: two_body, multi_body
+  perturbations:
+    j2: true
+    drag: true
+    srp: true
+    third_body: false
+  integrator: "rk45"
+
+output:
+  log_file: "mission_log.csv"
+  log_interval: 60.0 # seconds
