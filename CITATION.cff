@@ -6,7 +6,7 @@ authors:
 title: "Solar Sail Mission Simulation (SSMS)"
 version: 1.0.0
 date-released: 2026-02-18
-url: "https://github.com/yourusername/solar-sail-sim"
+url: "https://github.com/SahilKhutey/-Solar-Sail-Mission-Simulation-SSMS-"
 abstract: "A high-fidelity, Python-based solar sail simulation environment featuring N-body gravity, advanced SRP modeling, and trajectory optimization tools for interplanetary mission design."
 keywords:
   - astrodynamics
