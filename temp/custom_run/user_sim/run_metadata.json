@@ -1,0 +1,90 @@
+{
+    "system": {
+        "os": "Windows",
+        "os_release": "10",
+        "os_version": "10.0.19045",
+        "machine": "AMD64",
+        "processor": "Intel64 Family 6 Model 78 Stepping 3, GenuineIntel",
+        "python_version": "3.14.0",
+        "hostname": "Pankaj"
+    },
+    "git": {
+        "commit_hash": "50236aa03dc3746202f1519784d197cba144d36c",
+        "is_dirty": true
+    },
+    "execution": {
+        "timestamp": "2026-02-20T14:19:48.161472+00:00",
+        "uuid": "2e6ff7a2-9759-414f-a240-c4b472aa13b3",
+        "command": [
+            "mission_campaign/runner.py",
+            "temp/custom_run/config.yaml",
+            "--output_dir",
+            "temp/custom_run",
+            "--run_id",
+            "user_sim"
+        ],
+        "duration_seconds": 66.8455274105072,
+        "status": "completed"
+    },
+    "configuration": {
+        "mission": {
+            "duration_days": 100.0,
+            "name": "Custom User Run",
+            "step_size": 60.0
+        },
+        "navigation": {
+            "attitude_noise_deg": 0.0,
+            "position_noise_km": 0.0,
+            "rate_noise_deg_s": 0.0,
+            "velocity_noise_kms": 0.0
+        },
+        "orbit": {
+            "altitude_km": 35740.0,
+            "eccentricity": 0.001,
+            "inclination_deg": 28.5,
+            "type": "LEO"
+        },
+        "output": {
+            "log_file": "mission_log.csv",
+            "log_interval": 300.0
+        },
+        "physics": {
+            "gravity_model": "two_body",
+            "integrator": "rk45",
+            "perturbations": {
+                "J2": true,
+                "drag": false,
+                "third_body": true
+            }
+        },
+        "spacecraft": {
+            "cd": 2.2,
+            "inertia": [
+                [
+                    100,
+                    0,
+                    0
+                ],
+                [
+                    0,
+                    100,
+                    0
+                ],
+                [
+                    0,
+                    0,
+                    100
+                ]
+            ],
+            "mass": 308.0,
+            "r_cp": [
+                0,
+                0,
+                0
+            ],
+            "reflectivity": 0.9,
+            "sail_area": 10000.0,
+            "thickness": 2.0
+        }
+    }
+}

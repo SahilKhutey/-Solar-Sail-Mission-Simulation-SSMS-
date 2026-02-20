@@ -13,6 +13,9 @@ class SolarSailMission:
         self.dynamics = DynamicsModel(config)
         self.state = self._init_state()
         self.time = 0.0
+        self.dt = float(config['mission'].get('step_size', 60.0)) # Adaptive step state
+        self.rtol = float(config['physics'].get('relative_tolerance', 1e-9))
+        self.atol = float(config['physics'].get('absolute_tolerance', 1e-12))
         
         # Navigation
         self.sensors = SensorModel(config)
@@ -109,16 +112,17 @@ class SolarSailMission:
                  estimated_state = self.state
         
         # 4. Guidance & Control
-        # Calculate Torque
-        # For now, zero torque (passive stability test)
-        control_torque = np.zeros(3)
+        control_torque = self._get_control_torque(estimated_state)
         self.dynamics.set_control(control_torque)
         
         # 5. Propagation (Dynamics)
         y = self.state.vector
-        dt = self.config['mission']['step_size']
         
-        success, t_next, y_next, dt_next = rk45_step(self.dynamics, self.time, y, dt, 1e-9)
+        # Use current adaptive step size
+        success, t_next, y_next, dt_next = rk45_step(self.dynamics, self.time, y, self.dt, (self.atol, self.rtol))
+        
+        # Update step size for next attempt/step
+        self.dt = dt_next
         
         if success:
             self.time = t_next
@@ -126,3 +130,7 @@ class SolarSailMission:
             
         return self.time, [self.state.r[0], self.state.r[1], self.state.r[2], 
                            self.state.v[0], self.state.v[1], self.state.v[2]]
+
+    def _get_control_torque(self, state):
+        # Default: zero torque (passive stability test)
+        return np.zeros(3)

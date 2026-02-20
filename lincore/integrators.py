@@ -59,21 +59,22 @@ def rk45_step(f, t, y, dt, tol, *args, dt_max=None):
     y5 = y_np + dt * (b5_1*k1 + b5_3*k3 + b5_4*k4 + b5_5*k5 + b5_6*k6)
     
     # Error estimate
-    # Use component-wise relative error logic if tol is vector
-    # If scalar, broadcasting works
     delta = np.abs(y5 - y4)
-    # Avoid division by zero if tol has zeros? Assume valid tol.
     
-    # Check if tol is scalar or array
-    # If scalar, we want standard norm? No, max ratio is better for mixed units anyway if we could scale.
-    # But for backward compat with scalar tol, let's assume scalar tol implies "absolute error constraint on all components" or "norm error"?
-    # The previous code used norm(y5-y4) <= tol. 
-    # That is equivalent to sqrt(sum(err^2)) <= tol.
-    # New logic: max(err_i / tol_i) <= 1.0. 
-    # To keep scalar behavior similar: max(err_i) <= tol.
-    # This is slightly different from L2 norm but safer.
+    # Scientific Mixed Tolerance Metric
+    # tol_i = atol + rtol * max(|y4_i|, |y5_i|)
+    # This prevents division by zero and scales correctly for position vs velocity.
+    if isinstance(tol, tuple) and len(tol) == 2:
+        atol, rtol = tol
+    else:
+        # Fallback if only one tol is provided
+        atol = tol
+        rtol = tol
+        
+    scale_y = np.maximum(np.abs(y4), np.abs(y5))
+    tol_metric = np.maximum(atol + rtol * scale_y, 1e-15)
     
-    ratio = delta / tol
+    ratio = delta / tol_metric
     error_metric = np.max(ratio)
     
     if error_metric < 1e-15:

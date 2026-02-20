@@ -70,14 +70,28 @@ class DynamicsModel:
             acc += j2_perturbation(r)
             
         if self.perturbations.get('srp'):
+            # Convert to Heliocentric if necessary
+            if self.orbit_type == 'LEO': # or any geocentric
+                r_sun_earth = get_body_state('earth', t)[:3] # Vector Sun->Earth? 
+                # get_body_state returns r referenced to Sun. So r_earth (Sun->Earth).
+                # r is Earth->SC.
+                # r_helio (Sun->SC) = r_earth (Sun->Earth) + r (Earth->SC)
+                r_earth = get_body_state('earth', t)[:3]
+                r_helio = r_earth + r 
+            else:
+                 # Assumed heliocentric
+                r_helio = r
+                
             # Use actual attitude 'q'
-            acc += solar_pressure(r, q, self.mass, self.area, self.refl, t=t)
+            acc += solar_pressure(r_helio, q, self.mass, self.area, self.refl, t=t)
             
         if self.perturbations.get('drag') and self.orbit_type == 'LEO':
             acc += atmospheric_drag(r, v, self.mass, self.area, self.drag_coeff)
             
         if self.n_body:
-            acc += self.n_body(t, r)
+            # Determine origin
+            origin = 'SUN' if self.orbit_type == 'Heliocentric' else 'EARTH'
+            acc += self.n_body(t, r, origin=origin)
             
         # 3. Rotational Dynamics
         # Kinematics: q_dot = 0.5 * Omega * q

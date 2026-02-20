@@ -13,3 +13,15 @@ build/
 docs/_build/
 legacy/
 monte_carlo_results.png
+campaign_data/
+repro_data/
+test_campaign_data/
+*.db
+*.csv
+!mission_log.csv
+temp_*
+*.parquet
+*.json
+!config/*.json
+!run_metadata.json
+

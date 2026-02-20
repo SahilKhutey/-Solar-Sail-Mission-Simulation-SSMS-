@@ -1,0 +1,44 @@
+mission:
+  duration_days: 100.0
+  name: Optimal Design Verification
+  step_size: 60.0
+navigation:
+  attitude_noise_deg: 0.0
+  position_noise_km: 0.0
+  rate_noise_deg_s: 0.0
+  velocity_noise_kms: 0.0
+orbit:
+  altitude_km: 35650.0
+  eccentricity: 0.001
+  inclination_deg: 28.5
+  type: LEO
+output:
+  log_file: mission_log.csv
+  log_interval: 60.0
+physics:
+  gravity_model: two_body
+  integrator: rk45
+  perturbations:
+    J2: true
+    drag: false
+    third_body: true
+spacecraft:
+  cd: 2.2
+  inertia:
+  - - 100
+    - 0
+    - 0
+  - - 0
+    - 100
+    - 0
+  - - 0
+    - 0
+    - 100
+  mass: 398.2
+  r_cp:
+  - 0.1
+  - 0.1
+  - 0.0
+  reflectivity: 0.826
+  sail_area: 85306.0
+  thickness: 1.32

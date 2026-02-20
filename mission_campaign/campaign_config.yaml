@@ -1,0 +1,65 @@
+# Campaign Configuration
+campaign_name: "SolarSail_Research_Campaign_v1"
+description: "Large-scale parametric exploration of solar sail mission design space."
+
+# Execution Settings
+execution:
+  mode: "parallel" # serial, parallel, cluster
+  num_workers: 8   # Increased for large batch
+  batch_size: 100  # Number of runs per batch
+
+# Sampler Settings
+sampling:
+  method: "latin_hypercube" # latin_hypercube, sobol, monte_carlo
+  num_samples: 10000        # Total number of simulations for this campaign
+  seed: 42
+
+# Parameter Space Definitions
+parameters:
+  sail_area:
+    min: 1000.0   # m^2
+    max: 100000.0 # m^2
+    distribution: "log-uniform"
+
+  sail_mass:
+    min: 10.0  # kg
+    max: 500.0 # kg
+    distribution: "uniform"
+
+  reflectivity:
+    min: 0.70
+    max: 0.99
+    distribution: "uniform"
+
+  thickness:
+    min: 1.0  # micrometer
+    max: 10.0 # micrometer
+    distribution: "uniform"
+
+  launch_altitude:
+    min: 400.0   # km
+    max: 35786.0 # km (GEO)
+    distribution: "uniform"
+
+  steering_law:
+    options: ["fixed_angle", "optimal_direction"]
+    distribution: "categorical"
+
+# Physics Settings
+physics:
+  integration_method: "RK45"
+  relative_tolerance: 1.0e-5 # Relaxed from 1e-9 for speed
+  absolute_tolerance: 1.0e-8 # Relaxed from 1e-12
+  solar_model: "inverse_square" # inverse_square, realistic_flux
+  perturbations:
+    J2: true
+    drag: false # Negligible for high orbit/interplanetary
+    third_body: false
+
+# Output Settings
+output:
+  base_dir: "campaign_data"
+  save_trajectory: true
+  save_stress: true
+  save_thermal: true
+  format: "parquet"

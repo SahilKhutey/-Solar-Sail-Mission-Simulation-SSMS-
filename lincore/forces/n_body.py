@@ -52,24 +52,46 @@ class NBodyGravity:
             'SATURN': 3.7931187e7
         }
         
-    def __call__(self, t, r):
+    def __call__(self, t, r, origin='SUN'):
         """
         Calculate perturbation acceleration.
         t: Time (seconds past J2000)
-        r: Position vector (km) relative to Sun
+        r: Position vector (km) relative to Origin
+        origin: Central body name (default 'SUN')
         """
         r_bodies_list = []
         mus_list = []
         
+        # Get Origin State (if not Sun)
+        if origin != 'SUN':
+             r_origin = get_body_state(origin, t)[:3]
+        else:
+             r_origin = np.zeros(3)
+        
         for body in self.bodies:
-            # Get state [r, v], we need r
-            # get_body_state returns state relative to Sun
+            # Skip if body is the origin
+            if body.upper() == origin.upper():
+                continue
+                
+            # Get state [r, v], relative to Sun
             state = get_body_state(body, t) 
-            r_b = state[:3]
+            r_b_sun = state[:3]
+            
+            # Shift to Origin Frame
+            r_b = r_b_sun - r_origin
             
             r_bodies_list.append(r_b)
             mus_list.append(self.mus.get(body.upper(), 0.0))
             
+        # Special case: If origin is Earth, we likely want Sun as a Third Body
+        # But Sun is not in get_body_state list explicitly (returns 0).
+        # We need to handle 'SUN' in self.bodies explicitly if origin != 'SUN'.
+        if origin != 'SUN' and 'SUN' in self.bodies:
+             # Sun position relative to Origin (e.g. Earth)
+             # r_sun_rel = r_sun - r_origin = 0 - r_origin = -r_origin
+             r_bodies_list.append(-r_origin)
+             mus_list.append(MU_SUN) 
+
         r_bodies = np.array(r_bodies_list)
         mus = np.array(mus_list)
         
