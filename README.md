@@ -70,6 +70,15 @@ python -m streamlit run dashboard/app.py
 ```
 *Access features like the **Design Space Explorer**, **3D Trajectory Viewer (with real target ephemeris)**, and the **Custom Mission Designer**.*
 
+### 🐳 Docker Container (Isolated Deployment)
+Ensure perfect reproducibility by running the SSMS Research Platform inside an isolated container.
+
+```bash
+docker build -t ssms-dashboard .
+docker run -p 8501:8501 ssms-dashboard
+```
+*Then navigate to `http://localhost:8501`.*
+
 ### Graphical User Interface (GUI)
 Launch the mission control dashboard:
 ```bash
