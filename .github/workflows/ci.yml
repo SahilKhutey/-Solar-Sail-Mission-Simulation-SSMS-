@@ -26,13 +26,21 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install -e .[dev]
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install pytest pytest-cov black flake8
         
-    - name: Test Core Engine Import
+    - name: Check code formatting with Black
       run: |
-        python -c "import lincore; print('Lincore imported successfully!')"
-         
-    - name: Test Backend Execution
+        black --check lincore tests
+        
+    - name: Lint with flake8
       run: |
-        # Quick 1-day trace to ensure math doesn't crash on standard setups
-        python mission_campaign/runner.py temp/custom_run/config.yaml --output_dir test_ci --run_id ci_run
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 lincore tests --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings.
+        flake8 lincore tests --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
+        
+    - name: Run automated test suite with coverage
+      run: |
+        pytest tests/ --cov=lincore --cov-report=xml --cov-fail-under=80

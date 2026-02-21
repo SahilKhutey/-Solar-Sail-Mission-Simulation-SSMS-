@@ -1,0 +1,21 @@
+[run]
+omit =
+    # Ignore UI and Desktop Applications
+    lincore/gui/*
+    lincore/ui/*
+    
+    # Ignore standalone validation scripts (run manually)
+    lincore/validation/*
+    
+    # Ignore deprecated or experimental modules
+    lincore/integrators.py
+    lincore/guidance/gauss_equations.py
+    lincore/guidance/orbital_elements.py
+    lincore/guidance/sail_optimizer.py
+    lincore/app.py
+    lincore/dynamics.py
+    lincore/eci_two_body.py
+    lincore/ephemeris.py
+    
+    # Ignore data download script
+    lincore/environment/download_kernels.py

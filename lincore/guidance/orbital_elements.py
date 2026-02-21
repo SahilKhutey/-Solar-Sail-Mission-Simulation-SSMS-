@@ -3,6 +3,7 @@ import numpy as np
 
 MU_EARTH = 398600.4418
 
+
 def get_rsw_frame(state):
     """
     Returns the Radial-Transverse-Normal (RSW) frame unit vectors.
@@ -12,19 +13,20 @@ def get_rsw_frame(state):
     """
     r_vec = np.array(state[:3])
     v_vec = np.array(state[3:6])
-    
+
     r_mag = np.linalg.norm(r_vec)
     h_vec = np.cross(r_vec, v_vec)
     h_mag = np.linalg.norm(h_vec)
-    
+
     if r_mag == 0 or h_mag == 0:
-        return np.eye(3) # Identity as fallback
-        
+        return np.eye(3)  # Identity as fallback
+
     r_hat = r_vec / r_mag
     w_hat = h_vec / h_mag
     s_hat = np.cross(w_hat, r_hat)
-    
+
     return r_hat, s_hat, w_hat
+
 
 def state_to_elements(state, mu=MU_EARTH):
     """
@@ -50,9 +52,9 @@ def state_to_elements(state, mu=MU_EARTH):
 
     # Energy
     energy = v_mag**2 / 2 - mu / r_mag
-    
+
     if abs(energy) < 1e-9:
-        a = float('inf')
+        a = float("inf")
     else:
         a = -mu / (2 * energy)
 
@@ -63,39 +65,40 @@ def state_to_elements(state, mu=MU_EARTH):
     if n_mag != 0:
         RAAN = math.acos(max(-1.0, min(1.0, n[0] / n_mag)))
         if n[1] < 0:
-            RAAN = 2*math.pi - RAAN
+            RAAN = 2 * math.pi - RAAN
     else:
         RAAN = 0
 
     # Argument of Perigee
     if n_mag != 0 and e > 1e-8:
-        val = np.dot(n, e_vec)/(n_mag*e)
+        val = np.dot(n, e_vec) / (n_mag * e)
         val = max(-1.0, min(1.0, val))
         omega = math.acos(val)
         if e_vec[2] < 0:
-            omega = 2*math.pi - omega
+            omega = 2 * math.pi - omega
     else:
         omega = 0
 
     # True Anomaly
     if e > 1e-8:
-        val = np.dot(e_vec, r)/(e*r_mag)
+        val = np.dot(e_vec, r) / (e * r_mag)
         val = max(-1.0, min(1.0, val))
         nu = math.acos(val)
         if np.dot(r, v) < 0:
-            nu = 2*math.pi - nu
+            nu = 2 * math.pi - nu
     else:
         nu = 0
-        
+
     # Mean motion
     mean_motion = math.sqrt(mu / a**3) if a > 0 else 0
-    
+
     # Argument of Latitude u = omega + nu
     u = omega + nu
-    if u >= 2*math.pi: u -= 2*math.pi
-    
+    if u >= 2 * math.pi:
+        u -= 2 * math.pi
+
     # Semi-latus rectum
-    p = a * (1 - e**2) if e < 1.0 else 0 # or h^2/mu
+    p = a * (1 - e**2) if e < 1.0 else 0  # or h^2/mu
 
     return {
         "a": a,
@@ -107,5 +110,5 @@ def state_to_elements(state, mu=MU_EARTH):
         "f": nu,
         "u": u,
         "n": mean_motion,
-        "p": p
+        "p": p,
     }

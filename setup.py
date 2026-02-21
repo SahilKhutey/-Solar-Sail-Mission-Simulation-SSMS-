@@ -9,12 +9,12 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
 setup(
     name="lincore",
     version="0.1.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Sahil Khutey",
+    author_email="sahilkhutey@example.com",
     description="A Mission-Grade Solar Sail Simulation Framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/solar-sail-sim",
+    url="https://github.com/SahilKhutey/-Solar-Sail-Mission-Simulation-SSMS-",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

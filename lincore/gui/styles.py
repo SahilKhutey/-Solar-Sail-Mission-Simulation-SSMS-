@@ -1,4 +1,3 @@
-
 NASA_STYLE = """
 /* Main Window Background */
 QMainWindow {
