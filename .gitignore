@@ -24,4 +24,5 @@ temp_*
 *.json
 !config/*.json
 !run_metadata.json
-
+*.pkl
+analysis/models/

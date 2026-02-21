@@ -163,12 +163,13 @@ def sync_db(known_ids):
 def generate_report():
     print(f"\n[INFO] Starting Report Generation for {CAMPAIGN_NAME}...")
     
+    import shutil
     temp_db = "temp_mission_report.db"
     try:
-        subprocess.run(f"copy {DB_PATH} {temp_db}", shell=True, check=True)
+        shutil.copy2(DB_PATH, temp_db)
         print(" [OK] Database snapshot created.")
-    except:
-        print(" [WARN] Copy failed. Using direct DB.")
+    except Exception as e:
+        print(f" [WARN] Copy failed: {e}. Using direct DB.")
         temp_db = DB_PATH
         
     cmd = [sys.executable, "reporting_engine/report_builder.py", 

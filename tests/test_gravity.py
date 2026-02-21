@@ -111,9 +111,14 @@ def test_closed_orbit():
         return np.concatenate((v, acc))
         
     current_t = 0
+    dt_adaptive = 10.0
     while current_t < period:
-        step = min(10.0, period - current_t)
-        _, current_t, y, _ = rk45_step(dynamics, current_t, y, step, 1e-10)
+        step = min(dt_adaptive, period - current_t)
+        success, t_next, y_next, dt_next = rk45_step(dynamics, current_t, y, step, 1e-10)
+        dt_adaptive = dt_next
+        if success:
+            current_t = t_next
+            y = y_next
         
     dist = np.linalg.norm(y[:3] - y0[:3])
     print(f"Closure Error: {dist:.4f} km")
