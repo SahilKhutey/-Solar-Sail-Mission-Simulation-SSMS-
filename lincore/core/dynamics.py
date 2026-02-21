@@ -25,6 +25,8 @@ class DynamicsModel:
         self.area = self.sc_config["sail_area"]
         self.refl = self.sc_config.get("reflectivity", 1.0)
         self.drag_coeff = self.sc_config.get("drag_coeff", 2.2)
+        self.degradation_half_life = self.sc_config.get("degradation_half_life", 0.0)
+        self.billowing_factor = self.sc_config.get("billowing_factor", 0.0)
 
         # Determine center body
         self.orbit_type = config["orbit"]["type"]
@@ -85,7 +87,11 @@ class DynamicsModel:
                 r_helio = r
 
             # Use actual attitude 'q'
-            acc += solar_pressure(r_helio, q, self.mass, self.area, self.refl, t=t)
+            acc += solar_pressure(
+                r_helio, q, self.mass, self.area, self.refl, t=t,
+                degradation_half_life=self.degradation_half_life,
+                billowing_factor=self.billowing_factor
+            )
 
         if self.perturbations.get("drag") and self.orbit_type == "LEO":
             acc += atmospheric_drag(r, v, self.mass, self.area, self.drag_coeff)

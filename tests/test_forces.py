@@ -56,3 +56,27 @@ def test_srp_conical_shadow():
     # Standard Reflection - use t=0 so Ephemeris body positions are loaded
     acc = solar_pressure(r_sat, q=q_sun_facing, mass=10.0, area=100.0, reflectivity=0.9, t=0.0)
     assert np.linalg.norm(acc) > 0.0
+
+def test_srp_degradation():
+    """Test that optical degradation reduces SRP acceleration over time."""
+    r_sat = np.array([0, 1.5e8, 0])
+    q_sun_facing = [0.70710678, 0.70710678, 0.0, 0.0]
+    
+    acc_t0 = solar_pressure(r_sat, q=q_sun_facing, mass=10.0, area=100.0, reflectivity=0.9, t=0.0, degradation_half_life=10.0)
+    acc_t10 = solar_pressure(r_sat, q=q_sun_facing, mass=10.0, area=100.0, reflectivity=0.9, t=10.0, degradation_half_life=10.0)
+    
+    assert np.linalg.norm(acc_t10) < np.linalg.norm(acc_t0)
+
+def test_srp_billowing():
+    """Test that billowing factor alters the force vector direction."""
+    r_sat = np.array([0, 1.5e8, 0])
+    # Use a tilted quaternion so normal vector is not perfectly aligned with sun vector
+    q_tilted = [0.92387953, 0.38268343, 0.0, 0.0] # 45 deg tilt around X
+    
+    acc_flat = solar_pressure(r_sat, q=q_tilted, mass=10.0, area=100.0, reflectivity=0.9, t=0.0, billowing_factor=0.0)
+    acc_billowed = solar_pressure(r_sat, q=q_tilted, mass=10.0, area=100.0, reflectivity=0.9, t=0.0, billowing_factor=0.5)
+    
+    dir_flat = acc_flat / np.linalg.norm(acc_flat)
+    dir_billowed = acc_billowed / np.linalg.norm(acc_billowed)
+    
+    assert not np.allclose(dir_flat, dir_billowed)

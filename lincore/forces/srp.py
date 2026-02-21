@@ -95,9 +95,9 @@ def conical_shadow(r_sc, r_planet, R_planet, R_sun=R_SUN):
         return 1.0  # Sun
 
 
-def solar_pressure(r_helio, q, mass, area, reflectivity, t=0.0):
+def solar_pressure(r_helio, q, mass, area, reflectivity, t=0.0, degradation_half_life=None, billowing_factor=0.0):
     """
-    SRP Acceleration with Eclipse Check.
+    SRP Acceleration with Eclipse Check, Optical Degradation, and Billowing.
     """
     r_dist = np.linalg.norm(r_helio)
     if r_dist == 0:
@@ -137,13 +137,34 @@ def solar_pressure(r_helio, q, mass, area, reflectivity, t=0.0):
     if cos_theta <= 0:
         return np.zeros(3)  # Backside or edge-on
 
+    # Optical Degradation Model
+    actual_refl = reflectivity
+    if degradation_half_life and degradation_half_life > 0 and t > 0:
+        # Exponential decay of reflectivity towards 0.0 or a minimum baseline
+        # Let's say it degrades to half its original reflectivity after the half_life
+        baseline_refl = 0.2  # Arbitrary damaged baseline
+        if actual_refl > baseline_refl:
+            decay = np.exp(-t / degradation_half_life)
+            actual_refl = baseline_refl + (actual_refl - baseline_refl) * decay
+
     # Acc = P * A / (c * m) * (1+rho) * cos^2(theta) * n
     # P in W/m^2. A in m^2. m in kg. c in m/s.
     # Include nu (shadow factor)
 
     acc_mag_m_s2 = (
-        nu * (flux * area / (mass * (C_LIGHT * 1000))) * (1 + reflectivity) * (cos_theta**2)
+        nu * (flux * area / (mass * (C_LIGHT * 1000))) * (1 + actual_refl) * (cos_theta**2)
     )
     acc_mag_km_s2 = acc_mag_m_s2 / 1000.0
 
-    return acc_mag_km_s2 * n_eci
+    # Generalized Sail Model (Billowing)
+    # A perfectly flat sail exerts force exactly along the normal vector n_eci
+    # A highly billowed sail (parachute) exerts force closer to the incident light vector s_to_sun
+    force_dir = (1.0 - billowing_factor) * n_eci + billowing_factor * s_to_sun
+    force_dir_norm = np.linalg.norm(force_dir)
+    
+    if force_dir_norm > 0:
+        force_dir = force_dir / force_dir_norm
+    else:
+        force_dir = n_eci
+
+    return acc_mag_km_s2 * force_dir

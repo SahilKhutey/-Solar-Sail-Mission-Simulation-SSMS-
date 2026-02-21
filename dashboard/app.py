@@ -187,6 +187,11 @@ elif page == "Mission Designer (Custom)":
         alt = c2.number_input("Altitude (km)", 200.0, 100000.0, 35740.0)
         duration = c2.slider("Duration (Days)", 1, 1000, 100)
         
+        st.subheader("Advanced Sail Physics")
+        c3, c4 = st.columns(2)
+        deg_half_life = c3.slider("Optical Degradation Half-Life (Days)", 0.0, 3650.0, 0.0, help="0 = No degradation. Typical deep space sails degrade over years.")
+        billowing = c4.slider("Billowing Factor", 0.0, 1.0, 0.0, help="0.0 = Perfectly flat. 1.0 = Full parachute structural deformation.")
+        
         submitted = st.form_submit_button("🚀 Run Simulation")
         
     if submitted:
@@ -198,6 +203,7 @@ elif page == "Mission Designer (Custom)":
         custom_config = {
             'mission': {'name': 'Custom User Run', 'duration_days': float(duration), 'step_size': 60.0},
             'spacecraft': {'sail_area': area, 'mass': mass, 'reflectivity': refl, 'thickness': 2.0, 
+                           'degradation_half_life': float(deg_half_life * 86400.0), 'billowing_factor': billowing,
                            'cd': 2.2, 'inertia': [[100,0,0],[0,100,0],[0,0,100]], 'r_cp': [0,0,0]},
             'orbit': {'type': 'LEO', 'altitude_km': alt, 'inclination_deg': 28.5, 'eccentricity': 0.001},
             'physics': {'integrator': 'rk45', 'perturbations': {'J2': True, 'drag': False, 'n_body': ['SUN', 'MOON']}, 'gravity_model': 'two_body'},
