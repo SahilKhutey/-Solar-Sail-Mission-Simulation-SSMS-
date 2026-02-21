@@ -8,15 +8,16 @@ class SensorModel:
         self.config = config
         self.rng = np.random.default_rng()
         
+        nav_cfg = config.get('navigation', {})
         # Noise parameters (Standard Deviation)
         # Position noise [km]
-        self.sigma_r = config['navigation'].get('position_noise_km', 0.010) 
+        self.sigma_r = nav_cfg.get('position_noise_km', 0.010) 
         # Velocity noise [km/s]
-        self.sigma_v = config['navigation'].get('velocity_noise_kms', 0.001)
+        self.sigma_v = nav_cfg.get('velocity_noise_kms', 0.001)
         # Attitude noise [rad] (Star Tracker)
-        self.sigma_q = np.radians(config['navigation'].get('attitude_noise_deg', 0.01))
+        self.sigma_q = np.radians(nav_cfg.get('attitude_noise_deg', 0.01))
         # Rate noise [rad/s] (Gyro)
-        self.sigma_w = np.radians(config['navigation'].get('rate_noise_deg_s', 0.001))
+        self.sigma_w = np.radians(nav_cfg.get('rate_noise_deg_s', 0.001))
         
         # Bias (Constant for a mission duration usually)
         self.bias_r = self.rng.normal(0, self.sigma_r * 0.1, 3)
