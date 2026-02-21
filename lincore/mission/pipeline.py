@@ -74,59 +74,43 @@ class SolarSailMission:
         return State(0.0, r, v, q, w, float(self.config['spacecraft']['mass']))
 
     def step(self):
-        # 1. Environment (True World)
-        true_state_vec = self.state.vector
+        # 1. Propagation (Dynamics) - Adaptive loop
+        success = False
+        actual_dt = self.dt
+        while not success:
+            y = self.state.vector
+            success, t_next, y_next, dt_next = rk45_step(self.dynamics, self.time, y, self.dt, (self.atol, self.rtol))
+            actual_dt = self.dt
+            self.dt = dt_next
+            
+        self.time = t_next
+        self.state = State.from_vector(self.time, y_next, self.state.mass)
         
         # 2. Sensors (Measurement)
-        # Measure state (r, v, q, w)
-        # Note: SensorModel returns vector
         z_meas = self.sensors.measure(self.state)
         
         # 3. Navigation (Estimation)
         if self.ekf:
-             # Predict Step
-             self.ekf.predict(self.dynamics, self.config['mission']['step_size'])
+             # Predict Step forward to new time using the exact advanced dt
+             self.ekf.predict(self.dynamics, actual_dt)
              
              # Update Step (Measurement)
-             # H matrix?
-             # If mapping is Identity (Sensors measure state directly), H = I
-             # EKF.update expects z and H_jacobian check or H matrix?
-             # Let's check ekf.py ... update(z, H_jac)
-             # If H(x) = x, then Jacobian is Identity
-             def H_jacobian(x):
-                 return np.eye(len(x))
-                 
-             self.ekf.update(z_meas, H_jacobian)
+             def h_meas(x):
+                 return x
+             self.ekf.update(z_meas, h_meas)
              
              # Get Estimate
              est_vec = self.ekf.x
              estimated_state = State.from_vector(self.time, est_vec, self.state.mass)
         else:
-             # If no filter ...
-             # Or Perfect knowledge for debug?
-             # Let's use Perfect for now unless Nav enabled
              if self.config['physics'].get('navigation', False):
-                 # Construct state from measurement
                  estimated_state = State.from_vector(self.time, z_meas, self.state.mass)
              else:
                  estimated_state = self.state
-        
+                 
         # 4. Guidance & Control
         control_torque = self._get_control_torque(estimated_state)
         self.dynamics.set_control(control_torque)
-        
-        # 5. Propagation (Dynamics)
-        y = self.state.vector
-        
-        # Use current adaptive step size
-        success, t_next, y_next, dt_next = rk45_step(self.dynamics, self.time, y, self.dt, (self.atol, self.rtol))
-        
-        # Update step size for next attempt/step
-        self.dt = dt_next
-        
-        if success:
-            self.time = t_next
-            self.state = State.from_vector(self.time, y_next, self.state.mass)
             
         return self.time, [self.state.r[0], self.state.r[1], self.state.r[2], 
                            self.state.v[0], self.state.v[1], self.state.v[2]]

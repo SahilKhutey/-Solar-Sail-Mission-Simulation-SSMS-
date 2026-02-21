@@ -59,7 +59,16 @@ def rk45_step(f, t, y, dt, tol, *args, dt_max=None):
     
     # Check if tol is scalar or array
     # Logic: max(err_i / tol_i) <= 1.0. 
-    ratio = delta / tol
+    if isinstance(tol, tuple) and len(tol) == 2:
+        atol, rtol = tol
+    else:
+        atol = tol
+        rtol = tol
+        
+    scale_y = np.maximum(np.abs(y4), np.abs(y5))
+    tol_metric = np.maximum(atol + rtol * scale_y, 1e-15)
+    
+    ratio = delta / tol_metric
     error_metric = np.max(ratio)
     
     if error_metric < 1e-15:

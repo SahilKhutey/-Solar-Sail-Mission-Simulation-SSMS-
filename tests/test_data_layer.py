@@ -35,8 +35,9 @@ def test_logger():
     state = np.zeros(14)
     extras = {"energy": -1.5, "h_mag": 2.0}
     
-    logger.log_state(t, dt, state, extras)
-    logger.log_state(t+dt, dt, state, extras)
+    logger.log_state(t, dt, state)
+    logger.log_state(t+dt, dt, state)
+    logger.close()
     
     # Verify content
     with open(log_file, 'r') as f:
